@@ -1,0 +1,28 @@
+{
+  "name": "ireact",
+  "version": "1.0.0",
+  "description": "面向全浏览器的react实现",
+  "main": "main",
+  "scripts": {
+    "prepublish": "babel -d dist src"
+  },
+  "contributors": [
+    {
+      "name": "zongyu",
+      "email": "zongyu@baidu.com"
+    }
+  ],
+  "license": "MIT",
+  "repository": "http://gitlab.baidu.com/eform/eform-lang",
+  "bugs": "http://gitlab.baidu.com/eform/eform-lang/issues",
+  "devDependencies": {
+    "event-stream": "^3.1.7",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-indent": "^1.0.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-sourcemaps": "^2.5.0",
+    "gulp-uglify": "^2.1.2",
+    "gulp-umd": "^0.2.1"
+  }
+}
