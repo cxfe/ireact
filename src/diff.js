@@ -158,7 +158,7 @@ function renderComponent(component, way, isChild) {
             else {
 
                 toUnmount = inst;
-                inst = new childComponent(childComponent, childProps, context);
+                inst = new childComponent(childProps, context);
                 inst.nextBase = inst.nextBase || nextBase;
                 inst.parentComponent = component;
                 component.childComponent = inst;

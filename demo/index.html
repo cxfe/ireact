@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>调试用</title>
+    </head>
+    <body>
+        <div id="container"></div>
+        <script src="//ts.bdimg.com/libs/esl/2-0-6/esl.js"></script>
+        <script>
+            require.config({
+                baseUrl: '.',
+                paths: {
+                    'jquery': 'http://apps.bdimg.com/libs/jquery/1.10.2/jquery',
+                    'ireact': '../dist/ireact-jquery-with-string'
+                },
+                packages: [
+                    {
+                        'name': 'babel-runtime',
+                        'location': '../dep/babel-runtime/1.0.0/src',
+                        'main': 'main'
+                    }
+                ]
+            });
+
+            require(['index'], function () {
+
+            })
+        </script>
+    </body>
+</html>
