@@ -80,124 +80,138 @@ var STRING_FILE_LIST = [
 gulp.task('render-to-dom', function () {
 
     return gulp.src(DOM_FILE_LIST)
-        .pipe(removeAuthor())
-        .pipe(concat('ireact-dom' + '.js'))
-        .pipe(indent({
-            tabs: false,
-            amount: 4
-        }))
-        .pipe(umd({
-            exports: function () {
-                return 'React';
-            },
-            namespace: function () {
-                return 'React';
-            },
-            template: 'build/umd.tpl'
-        }))
-        .pipe(addAuthor({
-            name: 'ireact-dom',
-            comment: '渲染虚拟DOM'
-        }))
-        .pipe(gulp.dest('dist/'));
+    .pipe(removeAuthor())
+    .pipe(concat('ireact-dom' + '.js'))
+    .pipe(indent({
+        tabs: false,
+        amount: 4
+    }))
+    .pipe(umd({
+        exports: function () {
+            return 'React';
+        },
+        namespace: function () {
+            return 'React';
+        },
+        template: 'build/umd.tpl'
+    }))
+    .pipe(addAuthor({
+        name: 'ireact-dom',
+        comment: '渲染虚拟DOM'
+    }))
+    .pipe(gulp.dest('dist/'))
+    .pipe(sourcemaps.init())
+    .pipe(uglify({
+        mangle: {
+            except: [
+                'require',
+                'exports',
+                'module',
+                '$'
+            ]
+        }
+    }))
+    .pipe(rename('ireact-dom.min.js'))
+    .pipe(sourcemaps.write(''))
+    .pipe(gulp.dest('dist/'));
 });
 
 // render to string函数
 gulp.task('render-to-jquery', function () {
 
     return gulp.src(JQUERY_FILE_LIST)
-        .pipe(removeAuthor())
-        .pipe(concat('ireact-jquery' + '.js'))
-        .pipe(indent({
-            tabs: false,
-            amount: 4
-        }))
-        .pipe(umd({
-            dependencies: function () {
-                return [{
-                    name: 'jquery',
-                    amd: 'jquery',
-                    cjs: 'jquery',
-                    global: 'jQuery',
-                    param: '$'
-                }];
-            },
-            exports: function () {
-                return 'React';
-            },
-            namespace: function () {
-                return 'React';
-            },
-            template: 'build/umd.tpl'
-        }))
-        .pipe(addAuthor({
-            name: 'ireact-jquery',
-            comment: '基于JQuery的React'
-        }))
-        .pipe(gulp.dest('dist/'))
-        .pipe(sourcemaps.init())
-        .pipe(uglify({
-            mangle: {
-                except: [
-                    'require',
-                    'exports',
-                    'module',
-                    '$'
-                ]
-            }
-        }))
-        .pipe(rename('ireact-jquery.min.js'))
-        .pipe(sourcemaps.write(''))
-        .pipe(gulp.dest('dist/'));
+    .pipe(removeAuthor())
+    .pipe(concat('ireact-jquery' + '.js'))
+    .pipe(indent({
+        tabs: false,
+        amount: 4
+    }))
+    .pipe(umd({
+        dependencies: function () {
+            return [{
+                name: 'jquery',
+                amd: 'jquery',
+                cjs: 'jquery',
+                global: 'jQuery',
+                param: '$'
+            }];
+        },
+        exports: function () {
+            return 'React';
+        },
+        namespace: function () {
+            return 'React';
+        },
+        template: 'build/umd.tpl'
+    }))
+    .pipe(addAuthor({
+        name: 'ireact-jquery',
+        comment: '基于JQuery的React'
+    }))
+    .pipe(gulp.dest('dist/'))
+    .pipe(sourcemaps.init())
+    .pipe(uglify({
+        mangle: {
+            except: [
+                'require',
+                'exports',
+                'module',
+                '$'
+            ]
+        }
+    }))
+    .pipe(rename('ireact-jquery.min.js'))
+    .pipe(sourcemaps.write(''))
+    .pipe(gulp.dest('dist/'));
 });
 
 // render to string函数
 gulp.task('render-to-jquery-with-string', function () {
 
     return gulp.src(JQUERY_WITH_STRING_FILE_LIST)
-        .pipe(removeAuthor())
-        .pipe(concat('ireact-jquery-with-string' + '.js'))
-        .pipe(indent({
-            tabs: false,
-            amount: 4
-        }))
-        .pipe(umd({
-            dependencies: function () {
-                return [{
-                    name: 'jquery',
-                    amd: 'jquery',
-                    cjs: 'jquery',
-                    global: 'jQuery',
-                    param: '$'
-                }];
-            },
-            exports: function () {
-                return 'React';
-            },
-            namespace: function () {
-                return 'React';
-            },
-            template: 'build/umd.tpl'
-        }))
-        .pipe(addAuthor({
-            name: 'ireact-jquery-with-string',
-            comment: '添加了渲染字符串功能'
-        }))
-        .pipe(gulp.dest('dist/'))
-        .pipe(sourcemaps.init())
-        .pipe(uglify({
-            mangle: {
-                except: [
-                    'require',
-                    'exports',
-                    'module',
-                    '$'
-                ]
-            }
-        }))
-        .pipe(rename('ireact-jquery-with-string.min.js'))
-        .pipe(sourcemaps.write(''))
-        .pipe(gulp.dest('dist/'));
+    .pipe(removeAuthor())
+    .pipe(concat('ireact-jquery-with-string' + '.js'))
+    .pipe(indent({
+        tabs: false,
+        amount: 4
+    }))
+    .pipe(umd({
+        dependencies: function () {
+            return [{
+                name: 'jquery',
+                amd: 'jquery',
+                cjs: 'jquery',
+                global: 'jQuery',
+                param: '$'
+            }];
+        },
+        exports: function () {
+            return 'React';
+        },
+        namespace: function () {
+            return 'React';
+        },
+        template: 'build/umd.tpl'
+    }))
+    .pipe(addAuthor({
+        name: 'ireact-jquery-with-string',
+        comment: '添加了渲染字符串功能'
+    }))
+    .pipe(gulp.dest('dist/'))
+    .pipe(sourcemaps.init())
+    .pipe(uglify({
+        mangle: {
+            except: [
+                'require',
+                'exports',
+                'module',
+                '$'
+            ]
+        }
+    }))
+    .pipe(rename('ireact-jquery-with-string.min.js'))
+    .pipe(sourcemaps.write(''))
+    .pipe(gulp.dest('dist/'));
 });
 
 gulp.task('default', ['render-to-dom', 'render-to-jquery', 'render-to-jquery-with-string'], function () {

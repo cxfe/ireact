@@ -1,6 +1,6 @@
 {
     "name": "ireact",
-    "version": "1.0.0",
+    "version": "1.0.6",
     "description": "面向全浏览器的react实现",
     "main": "main",
     "scripts": {

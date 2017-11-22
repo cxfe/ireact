@@ -375,7 +375,7 @@ function diffAttributes(node, attrs, old) {
     // 如果存在旧属性，先删除不需要的旧属性
     each(old || {}, function (name) {
         if (!(attrs && name in attrs) && old[name] != null) {
-            setAccessor(node, name, null, isSvgMode);
+            setAccessor(node, name, null, isSvgMode, old[name]);
         }
     });
 
@@ -516,7 +516,7 @@ function recollectNodeTree(node) {
             return;
         }
 
-        if (vnode.ref) {
+        if (vnode && vnode.ref) {
             vnode.ref(null);
         }
 
@@ -554,7 +554,7 @@ function unmountComponent(component) {
 
         var vnode = DOM_CACHE_TOOL.get(elem, 'vnode');
 
-        if (vnode.ref) {
+        if (vnode && vnode.ref) {
             vnode.ref(null);
         }
 

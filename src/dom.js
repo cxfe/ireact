@@ -69,3 +69,263 @@ var VNODE_INSTANCE_MAP = {
         delete GLOBAL_DATA_CACHE[id];
     }
 };
+
+
+each([
+    'tabIndex',
+    'readOnly',
+    'maxLength',
+    'cellSpacing',
+    'cellPadding',
+    'rowSpan',
+    'colSpan',
+    'useMap',
+    'frameBorder',
+    'contentEditable'
+], function (i, item) {
+    PROP_FIX[item.toLowerCase()] = item;
+});
+
+if (!DOM_UTIL_SUPPORT.enctype) {
+    PROP_FIX.enctype = 'encoding';
+}
+
+/**
+ * 以下属性返回数字而不追加px
+ *
+ * @const
+ * @type {Object}
+ */
+var CSS_NUMBER = {
+    animationIterationCount: true,
+    columnCount: true,
+    fillOpacity: true,
+    flexGrow: true,
+    flexShrink: true,
+    fontWeight: true,
+    lineHeight: true,
+    opacity: true,
+    order: true,
+    orphans: true,
+    widows: true,
+    zIndex: true,
+    zoom: true
+};
+
+/**
+ * 用于匹配大写字符
+ *
+ * @type {RegExp}
+ */
+var R_UPPERCASE = /([A-Z])/g;
+
+/**
+ * 用于匹配MS开头的样式
+ *
+ * @type {RegExp}
+ */
+var R_MS_START = /^ms-/g;
+
+/**
+ * 将驼峰转换换连字符
+ *
+ * @param {string} s 要转换的字符串
+ * @return {*}
+ */
+function hyphenate(s) {
+
+    if (!s) {
+        return '';
+    }
+
+    return s.replace(R_UPPERCASE, '-$1').toLowerCase().replace(R_MS_START, '-ms-');
+}
+
+/**
+ * 对象类样式变更为字符串
+ *
+ * @param {Object} s 对象
+ * @return {string}
+ */
+function styleObjToCss(s) {
+
+    // 处理浏览器不支持透明度的问题
+    var str = '';
+
+    each(s, function (name, val) {
+
+        if (val != null) {
+
+            str += ' ' + hyphenate(name);
+            str += ': ';
+            str += val;
+
+            if (typeof val === 'number' && !CSS_NUMBER[name]) {
+                str += 'px';
+            }
+
+            str += ';';
+        }
+    });
+
+    return str.slice(1);
+}
+
+/**
+ * 将对象类的类名合并成字符串
+ *
+ * @param {Object} c 对象
+ * @return {string}
+ */
+function hashToClassName(c) {
+
+    var str = '';
+
+    each(c, function (name, valid) {
+        if (valid) {
+            str += ' ' + name;
+        }
+    });
+
+    return str.slice(1);
+}
+
+/* eslint-disable max-len */
+
+/**
+ * 判断一个属性是不是布尔属性
+ *
+ * @inner
+ * @type {RegExp}
+ */
+var R_PROPERTY_BOOLEAN = /^(?:checked|selected|async|autofocus|autoplay|controls|defer|disabled|hidden|ismap|loop|multiple|open|readonly|required|scoped)$/i;
+/* eslint-enable max-len */
+
+/**
+ * 判断属性名是不是可以用default-value可获取（IE67）
+ *
+ * @inner
+ * @type {RegExp}
+ */
+var R_USE_DEFAULT = /^(?:checked|selected)$/i;
+
+/**
+ * 获取或者设置元素的属性
+ *
+ * @param {Node|HTMLElement} node 要获取的元素
+ * @param {string=} name 属性名字
+ * @param {*} value 属性的值
+ * @param {boolean} isSvg 是否为SVG模式
+ */
+function setAccessor(node, name, value, isSvg) {
+
+    if (node.nodeType !== 1 || name === 'key' || name === 'ref') {
+        return;
+    }
+
+    name = name.toLowerCase();
+
+    // 优先处理事件
+    if (R_EVENT_PREFIX.test(name)) {
+        var type = RegExp.$1;
+        value ? DOM_EVENT_TOOL.bind(node, type, value) : DOM_EVENT_TOOL.unbind(node, type);
+        return;
+    }
+
+    // 处理设置HTML
+    if (name === 'dangerouslySetInnerHTML') {
+        if (value) {
+            node.innerHTML = value.__html || '';
+        }
+
+        return;
+    }
+
+    // 处理SVG对象
+    if (isSvg && /^xlink:?(.+)/.test(name)) {
+        if (value == null || value === false) {
+            node.removeAttributeNS('http://www.w3.org/1999/xlink', RegExp.$1);
+        }
+        else {
+            node.setAttributeNS('http://www.w3.org/1999/xlink', RegExp.$1, value);
+        }
+
+        return;
+    }
+
+    var attrName = PROP_FIX[name] || name;
+
+    // 处理布尔值
+    if (R_PROPERTY_BOOLEAN.test(name)) {
+
+        value = !!value;
+
+        if (!R_USE_DEFAULT.test(name)) {
+            node[attrName] = value;
+        }
+        else {
+            node['default-' + name.charAt(0).toUpperCase() + name.slice(1)] = node[attrName] = value;
+        }
+
+        return;
+    }
+
+    // 将对象类型的类转换成字符串类型
+    if (attrName === 'className' && value && typeof value === 'object') {
+        value = hashToClassName(value);
+    }
+
+    // 将对象类型的样式转换成字符串，不使用单一样式替换，而是直接替换CSS
+    if (name === 'style' && value && typeof value === 'object') {
+        value = styleObjToCss(value);
+    }
+
+    value = value == null ? '' : value;
+
+    // 处理样式
+    if (name === 'style') {
+        node.style.cssText = value;
+        return;
+    }
+
+    // 处理IE6-9下,设置input节点的type为'radio'后， 其value值会丢失，需要重置
+    if (!DOM_UTIL_SUPPORT.radioValue && name === 'type' && value === 'radio' && node.nodeName === 'INPUT') {
+        var val = node.value;
+
+        node.setAttribute('type', value);
+
+        if (val) {
+            node.value = val;
+        }
+
+        return;
+    }
+
+    // IE6-7下全部不使用setAttibute
+    if (!DOM_UTIL_SUPPORT.getSetAttribute) {
+
+        if (name === 'value' && node.nodeName === 'INPUT') {
+            node.defaultValue = value;
+        }
+
+        if ((name === 'width' || name === 'height') && value === '') {
+            value = 'auto';
+        }
+
+        if (name === 'contenteditable' && value === '') {
+            value = false;
+        }
+
+        var ret = node.getAttributeNode(name);
+
+        if (!ret) {
+            ret = node.ownerDocument.createAttribute(name);
+            node.setAttributeNode(ret);
+        }
+
+        ret.value = value += '';
+        return;
+    }
+
+    node.setAttribute(name, value + '');
+}
